@@ -1,49 +1,44 @@
 from tkinter import *
 from mss import mss, tools
-import cv2
+import pyautogui
 import threading
 import time
+import os
 from PIL import Image, ImageTk
 
 root = Tk()
 root.title("Timelapse App") #title of the app
-width = 768
-height = 432
-# root.minsize(width, height)
-# root.maxsize(width, height)
-# root.geometry(f'350+200') #sets starting resolution width x height and position x + y
+width = 1190
+height = 625
+root.geometry(f'{width}x{height}+350+200') #sets starting resolution width x height and position x + y
+root.resizable(0,0)
 
 #creating left_frame
 left_padding = 10
-left_width = (width/3.5)
-left_height = height-(left_padding*2)
+left_width = round(width/3.5)
+left_height = round(height-(left_padding*3))
 left_frame = Frame(root, width=left_width, height=left_height)
 left_frame.grid(row=0, column=0, padx=left_padding, pady=left_padding)
 left_frame.config(bg="#d3d3d3")
 
 #creating right_frame
 right_padding = 10
-right_width = (width - width/3.5 - (right_padding*3))
-right_height = (height-(right_padding*2))
+right_height = round(height-(right_padding*2.3))
+right_width = round(right_height*(16/10))
 right_frame = Frame(root, width=right_width, height=right_height)
 right_frame.grid(row=0, column=1, padx=0, pady=right_padding)
 right_frame.config(bg="#d3d3d3")
-canvas = Canvas(right_frame, width=right_width-right_padding, height=right_height-right_padding)
 
-#create text in left_frame
-display_text = Label(left_frame, text="This is an app for creating a timelapse")
-display_text.grid(row=0, column=0, padx=10, pady=10)
-
-# #create text in right_frame
-# display_text = Label(right_frame, text="The images will show up here")
-# display_text.grid(row=0, column=0, padx=10, pady=10)
+#experimenting with canvas
+# canvas = Canvas(root, width=(width - width/3.5 - (10*3)), height=(height-(10*2)))
+# canvas.grid(row=0, column=1, padx=0, pady=10)
 
 #create toolbar in left_frame
 toolbar_padding = 10
 tool_width = left_width - left_padding*2
 tool_height = 150
 toolbar = Frame(left_frame, width=tool_width, height=tool_height) #specify in left_frame
-toolbar.grid(row=1, column=0, padx=toolbar_padding, pady=(left_height - tool_height + toolbar_padding)/2)
+toolbar.grid(row=0, column=0, padx=toolbar_padding, pady=(left_height - tool_height + toolbar_padding)/2)
 toolbar.config(bg="#b3b3b3")
 
 end = False # this controls the screenshot loop
@@ -56,17 +51,40 @@ def start_rec():
     if (running == False):
         running = True
         end = False
-        time.sleep(1) # give 1 second to close the timelapse app before starting
+        time.sleep(2) # give 2 seconds to close the timelapse app before starting to record
+        if (not os.path.isdir("temp_storage")):
+            os.mkdir("temp_storage")
         while (end == False):
-            with mss() as sct:
-                filename = sct.shot(mon=-1, output="output.png") # this should create a new folder before taking more screenshots
-            print(filename)
+            #screenshot --> convert version (OBSOLETE)
+            # with mss() as sct:
+            #     filename = sct.shot(mon=-1, output=f"temp_storage/{time.strftime('%m-%d-%Y %H-%M-%S')}.png")
+            # print(filename) #prints file in png state
             # img = (Image.open(filename)) # PIL
-            # resized_img = img.resize((640, 400), None, None)
+            # rgb_img = img.convert('RGB')
+            # rgb_img.save(f'{os.path.splitext(filename)[0]}.jpg')
+            # os.remove(filename)
+            # resized_img = rgb_img.resize((right_width-20, right_height-20), None, None) #use right_frame params to show image
             # new_img = ImageTk.PhotoImage(resized_img)
             # final_img = Label(right_frame, image=new_img)
             # final_img.grid(row=0, column=0, padx=10, pady=10)
-            time.sleep(1) # 1 fps, could be lower but would have to figure out how to instantly kill the process
+
+            #not writing to storage version
+            with mss() as sct:
+                monitor = sct.monitors[0]
+                grabbed_img = sct.grab(monitor)
+            png = tools.to_png(grabbed_img.rgb, grabbed_img.size)
+            img = Image.frombytes("RGB", grabbed_img.size, grabbed_img.bgra, "raw", "BGRX") # PIL
+            img = img.convert('RGB')
+            output = f"temp_storage/{time.strftime('%m-%d-%Y %H-%M-%S')}.jpg"
+            img.save(output)
+
+            #resize image for display
+            resized_img = img.resize((right_width-20, right_height-20), None, None) #use right_frame params to show image
+            new_img = ImageTk.PhotoImage(resized_img)
+            final_img = Label(right_frame, image=new_img)
+            final_img.grid(row=0, column=0, padx=10, pady=10)
+
+            time.sleep(2) # sets fps, figure out how to stop process while sleeping IMPORTANT
         running = False
         print('STOPPED')
         
@@ -79,6 +97,13 @@ def stop():
     print("Set end to true")
     # put turning into video code here
 
+    #   removal code (will need to be implemented eventually)
+    # if (os.path.isdir("temp_storage")):
+    #     files = os.listdir("temp_storage")
+    #     for file in files:
+    #         os.remove(f"temp_storage/{file}")
+    #     os.rmdir("temp_storage")
+    #     print("Removed temp_storage and all its files")
 
 start_button = Button(toolbar, text="Start recording", command=threading.Thread(target=start_rec).start)
 start_button.grid(row=1, column=0, padx=10, pady=10)
