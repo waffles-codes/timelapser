@@ -6,6 +6,12 @@ import time
 import os
 from PIL import Image, ImageTk
 
+#the purpose of this code is to keep pyautogui highlighted
+#so it isn't accidentally deleted by any future edits
+screenWidth, screenHeight = pyautogui.size()
+print(screenWidth, screenHeight)
+
+#start
 root = Tk()
 root.title("Timelapse App") #title of the app
 width = 1190
@@ -24,7 +30,7 @@ left_frame.config(bg="#d3d3d3")
 #creating right_frame
 right_padding = 10
 right_height = round(height-(right_padding*2.3))
-right_width = round(right_height*(16/10))
+right_width = round(right_height*(16/10))  # make display 16 by 10
 right_frame = Frame(root, width=right_width, height=right_height)
 right_frame.grid(row=0, column=1, padx=0, pady=right_padding)
 right_frame.config(bg="#d3d3d3")
@@ -38,7 +44,7 @@ toolbar_padding = 10
 tool_width = left_width - left_padding*2
 tool_height = 150
 toolbar = Frame(left_frame, width=tool_width, height=tool_height) #specify in left_frame
-toolbar.grid(row=0, column=0, padx=toolbar_padding, pady=(left_height - tool_height + toolbar_padding)/2)
+toolbar.grid(row=1, column=0, padx=toolbar_padding, pady=(left_height - tool_height + toolbar_padding)/2)
 toolbar.config(bg="#b3b3b3")
 
 end = False # this controls the screenshot loop
@@ -63,6 +69,7 @@ def start_rec():
             img = Image.frombytes("RGB", grabbed_img.size, grabbed_img.bgra, "raw", "BGRX") # PIL
             img = img.convert('RGB')
             output = f"temp_storage/{time.strftime('%m-%d-%Y %H-%M-%S')}.jpg"
+            #if the time set is < 1 sec, the previous image will sometimes be overwritten
             img.save(output)
 
             #resize image for display
@@ -71,11 +78,13 @@ def start_rec():
             final_img = Label(right_frame, image=new_img)
             final_img.grid(row=0, column=0, padx=10, pady=10)
 
-            time.sleep(2) # sets fps, figure out how to stop process while sleeping IMPORTANT
+            time.sleep(5) #sets seconds per frame (spf), figure out how to stop process while sleeping IMPORTANT
         running = False
         print('STOPPED')
         
     else:
+        message_label = Label(left_frame, text='The recording is already running')
+        message_label.grid(row=0, column=0, padx=10, pady=10)
         print('The recording is already running')
 
 def stop():
@@ -92,7 +101,22 @@ def stop():
     #     os.rmdir("temp_storage")
     #     print("Removed temp_storage and all its files")
 
-start_button = Button(toolbar, text="Start recording", command=threading.Thread(target=start_rec).start)
+# this is to bypass the "threads can only be started once" error
+def create_start_thread():
+	return threading.Thread(target=start_rec)
+
+def start_thread():
+    global end
+    global running
+    if running == False:
+        print("Starting thread")
+        thread = create_start_thread()
+        print(thread)
+        thread.start()
+    elif end == False:
+        print("The recording is already running")
+
+start_button = Button(toolbar, text="Start recording", command=start_thread)
 start_button.grid(row=1, column=0, padx=10, pady=10)
 
 stop_button = Button(toolbar, text="Stop", command=stop)
