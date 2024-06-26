@@ -1,6 +1,7 @@
 from tkinter import *
 from mss import mss, tools
 import threading
+import pyautogui
 import time
 import os
 from PIL import Image, ImageTk
@@ -54,20 +55,7 @@ def start_rec():
         if (not os.path.isdir("temp_storage")):
             os.mkdir("temp_storage")
         while (end == False):
-            #screenshot --> convert version (OBSOLETE)
-            # with mss() as sct:
-            #     filename = sct.shot(mon=-1, output=f"temp_storage/{time.strftime('%m-%d-%Y %H-%M-%S')}.png")
-            # print(filename) #prints file in png state
-            # img = (Image.open(filename)) # PIL
-            # rgb_img = img.convert('RGB')
-            # rgb_img.save(f'{os.path.splitext(filename)[0]}.jpg')
-            # os.remove(filename)
-            # resized_img = rgb_img.resize((right_width-20, right_height-20), None, None) #use right_frame params to show image
-            # new_img = ImageTk.PhotoImage(resized_img)
-            # final_img = Label(right_frame, image=new_img)
-            # final_img.grid(row=0, column=0, padx=10, pady=10)
-
-            #not writing to storage version
+            #not writing to storage version (FINAL)
             with mss() as sct:
                 monitor = sct.monitors[0]
                 grabbed_img = sct.grab(monitor)
