@@ -1,6 +1,5 @@
 from tkinter import *
 from mss import mss, tools
-import pyautogui
 import threading
 import time
 import os
