@@ -25,7 +25,7 @@ root.grid_rowconfigure((0), weight=0)
 #creating left_frame
 left_padding = 10
 left_width = round(width/3.5)
-left_height = round(height-230)
+left_height = round(height-305)
 left_frame = Frame(root, width=left_width, height=left_height)
 left_frame.grid(row=0, column=0, padx=left_padding, pady=left_padding)
 left_frame.config(bg="#d3d3d3")
@@ -57,15 +57,17 @@ toolbar = Frame(left_frame, width=tool_width, height=tool_height) #specify in le
 toolbar.grid(row=1, column=0, padx=toolbar_padding, pady=(left_height - tool_height + toolbar_padding)/2)
 toolbar.config(bg="#b3b3b3")
 toolbar.grid_columnconfigure((0), weight=0)
-toolbar.grid_rowconfigure((0,1,2,3), weight=0)
+toolbar.grid_rowconfigure((0,1,2,3,4), weight=0)
 
 end = False # this controls the screenshot loop
 running = False # this determines whether or not we can call screenshot loop when we press start
+seconds_per_frame = 2
 
 def start_rec():
     print('RUNNING START REC')
     global running
     global end
+    global seconds_per_frame
     if (running == False):
         running = True
         end = False
@@ -91,7 +93,7 @@ def start_rec():
             final_img.config(image=new_img)
             final_img.grid(row=0, column=0, padx=10, pady=10)
 
-            time.sleep(1) #sets seconds per frame (spf), figure out how to stop process while sleeping IMPORTANT
+            time.sleep(seconds_per_frame) #sets seconds per frame (spf), figure out how to stop process while sleeping IMPORTANT
         running = False
         print('STOPPED')
         
@@ -212,5 +214,41 @@ video_button.grid(row=2, column=0, padx=10, pady=10)
 
 clean_button = Button(toolbar, text="Clean temp", command=clean_temp)
 clean_button.grid(row=3, column=0, padx=10, pady=10)
+
+change_fps = Entry(toolbar, borderwidth=2)
+change_fps.insert(0, "Change seconds/frame")
+change_fps.grid(row=4, column=0, padx=5, pady=10)
+
+def is_float(element):
+    try:
+        float(element)
+        return True
+    except ValueError:
+        return False
+
+
+def fps_changer():
+    global seconds_per_frame
+    global message_label
+    temp_fps = change_fps.get()
+    if is_float(temp_fps) and float(temp_fps) > 0:
+        temp_fps = float(temp_fps)
+        seconds_per_frame = temp_fps
+
+        message = f"changed seconds_per_frame to {seconds_per_frame}"
+        message_label.config(text=message)
+        message_label.grid(row=0, column=0, padx=10, pady=10)
+        root.geometry(f'{width + round(len(message)*4.55)}x625')
+        print(f"changed seconds_per_frame to {seconds_per_frame}")
+    else: 
+        message = "enter a valid input please"
+        message_label.config(text=message)
+        message_label.grid(row=0, column=0, padx=10, pady=10)
+        root.geometry(f'{width + round(len(message)*4.55)}x625')
+        print("invalid input for change fps")
+
+fps_button = Button(toolbar, text="<", command=fps_changer)
+fps_button.grid(row=4, column=1, padx=5, pady=10)
+
 
 root.mainloop()
