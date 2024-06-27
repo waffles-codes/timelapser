@@ -85,8 +85,9 @@ def start_rec():
             png = tools.to_png(grabbed_img.rgb, grabbed_img.size)
             img = Image.frombytes("RGB", grabbed_img.size, grabbed_img.bgra, "raw", "BGRX") # PIL
             img = img.convert('RGB')
-            output = f"temp_storage/{time.strftime('%m-%d-%Y %H-%M-%S')}.jpg"
-            #if the time set is < 1 sec, the previous image will sometimes be overwritten
+            # output = f"temp_storage/{time.strftime('%m-%d-%Y %H-%M-%S')}.jpg" # human readable ver
+            output = f"temp_storage/{time.time_ns()}.jpg"                       # deployment ver
+            #if the time set is < 1 sec, the previous image will sometimes be overwritten (NO LONGER AN ISSUE)
             img.save(output)
 
             #resize image for display
@@ -102,10 +103,8 @@ def start_rec():
                     running = False # end the loop and set flags
                     print('STOPPED')
                     return
-                print("subtracting 1 from counter")
                 time.sleep(1)
             remaining_time = seconds_per_frame - int_spf
-            print(remaining_time)
             time.sleep(remaining_time)
         
         running = False #set flags in case they weren't set before
@@ -138,6 +137,7 @@ def make_video():
     if (end == True):
         image_folder = "temp_storage"
         video_name = f"{time.strftime('%m-%d-%Y %H-%M-%S')}.mp4"
+        # video_name = f"{time.time_ns()}.mp4"
 
         images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
         frame = cv2.imread(os.path.join(image_folder, images[0]))
