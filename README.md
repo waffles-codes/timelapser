@@ -9,3 +9,4 @@ This project was created due to a lack of such programs on the internet (that I 
 (also the settings that would have to be changed on OBS for this are painful and just not worth it every single time I want to create a timelapse)
 
 For anyone that finds this and needs it, enjoy!
+The .exe can be found in the dist folder.
