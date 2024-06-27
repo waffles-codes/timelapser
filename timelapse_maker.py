@@ -12,6 +12,12 @@ from PIL import Image, ImageTk
 screenWidth, screenHeight = pyautogui.size()
 print(screenWidth, screenHeight)
 
+#program defaults
+end = False # whether or not to stop the recording
+running = False # wheter or not the recording is running
+seconds_per_frame = 2 # default spf value
+made_video = False # whether or not a video has been made during program runtime (for delete button)
+
 #start
 root = Tk()
 root.title("Timelapse App") #title of the app
@@ -59,10 +65,6 @@ toolbar.config(bg="#b3b3b3")
 toolbar.grid_columnconfigure((0), weight=0)
 toolbar.grid_rowconfigure((0,1,2,3,4), weight=0)
 
-end = False # this controls the screenshot loop
-running = False # this determines whether or not we can call screenshot loop when we press start
-seconds_per_frame = 2
-
 def start_rec():
     print('RUNNING START REC')
     global running
@@ -93,8 +95,20 @@ def start_rec():
             final_img.config(image=new_img)
             final_img.grid(row=0, column=0, padx=10, pady=10)
 
-            time.sleep(seconds_per_frame) #sets seconds per frame (spf), figure out how to stop process while sleeping IMPORTANT
-        running = False
+            #this checks for stop process every second during the frame delay
+            int_spf = int(seconds_per_frame)
+            for i in range(int_spf):
+                if (end == True):
+                    running = False # end the loop and set flags
+                    print('STOPPED')
+                    return
+                print("subtracting 1 from counter")
+                time.sleep(1)
+            remaining_time = seconds_per_frame - int_spf
+            print(remaining_time)
+            time.sleep(remaining_time)
+        
+        running = False #set flags in case they weren't set before
         print('STOPPED')
         
     else:
@@ -112,14 +126,13 @@ def stop():
     message = "Set end to true"
     message_label.config(text=message)
     message_label.grid(row=0, column=0, padx=10, pady=10)
-    root.geometry(f'{width}x625')
+    root.geometry(f'{width + 105}x625')
     print("Set end to true")
-
-made_video = False
 
 def make_video():
     # put turning into video code here
     global end
+    global width
     global made_video
     global message_label
     if (end == True):
@@ -128,10 +141,10 @@ def make_video():
 
         images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
         frame = cv2.imread(os.path.join(image_folder, images[0]))
-        height, width, layers = frame.shape
+        height, f_width, layers = frame.shape
 
         fourcc = cv2.VideoWriter.fourcc(*'mp4v')
-        video = cv2.VideoWriter(video_name, fourcc, 30, (width, height))
+        video = cv2.VideoWriter(video_name, fourcc, 30, (f_width, height))
 
         for image in images:
             video.write(cv2.imread(os.path.join(image_folder, image)))
@@ -142,8 +155,7 @@ def make_video():
         message = "video has been created"
         message_label.config(text=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
-        # root.geometry(f'{width + round(len(message)*4.55)}x625')  #no clue why this makes the window go berserk
-        root.geometry('1240x625')
+        root.geometry(f'{(width + round(len(message)*4.69))}x625')  #no clue why this makes the window go berserk
         print("video made")
     else:
         message = "Stop the recording first"
@@ -225,7 +237,6 @@ def is_float(element):
         return True
     except ValueError:
         return False
-
 
 def fps_changer():
     global seconds_per_frame
