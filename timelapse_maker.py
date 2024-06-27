@@ -91,6 +91,9 @@ def stop():
     global end
     end = True
     print("Set end to true")
+
+def make_video():
+    print()
     # put turning into video code here
 
     #   removal code (will need to be implemented eventually)
@@ -121,5 +124,8 @@ start_button.grid(row=1, column=0, padx=10, pady=10)
 
 stop_button = Button(toolbar, text="Stop", command=stop)
 stop_button.grid(row=2, column=0, padx=10, pady=10)
+
+video_button = Button(toolbar, text="Save video", command=make_video)
+video_button.grid(row=3, column=0, padx=10, pady=10)
 
 root.mainloop()
