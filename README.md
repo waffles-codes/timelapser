@@ -8,5 +8,5 @@ and then later turns it into an .mp4 video using opencv.  <br/>
 This project was created due to a lack of such programs on the internet (that I could personally find), a desire to be efficient with my available hard drive space, and wanting to practice python GUIs. <br/>
 (also the settings that would have to be changed on OBS for this are painful and just not worth it every single time I want to create a timelapse)
 
-For anyone that finds this and needs it, enjoy!
+For anyone that finds this and needs it, enjoy! <br/>
 The .exe can be found in the dist folder.
