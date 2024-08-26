@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 #the purpose of this code is to keep pyautogui highlighted
 #so it isn't accidentally deleted by any future edits
 screenWidth, screenHeight = pyautogui.size()
-print(screenWidth, screenHeight)
+# print(screenWidth, screenHeight)
 
 #program defaults
 end = False # whether or not to stop the recording
@@ -66,7 +66,7 @@ toolbar.grid_columnconfigure((0), weight=0)
 toolbar.grid_rowconfigure((0,1,2,3,4), weight=0)
 
 def start_rec():
-    print('RUNNING START REC')
+    # print('RUNNING START REC')
     global running
     global end
     global seconds_per_frame
@@ -101,21 +101,21 @@ def start_rec():
             for i in range(int_spf):
                 if (end == True):
                     running = False # end the loop and set flags
-                    print('STOPPED')
+                    # print('STOPPED')
                     return
                 time.sleep(1)
             remaining_time = seconds_per_frame - int_spf
             time.sleep(remaining_time)
         
         running = False #set flags in case they weren't set before
-        print('STOPPED')
+        # print('STOPPED')
         
     else:
         message = "the rec is goin"
         message_label.config(textvariable=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
         root.geometry(f'{width + round(len(message)*4.55)}x625')
-        print('The recording is already running')
+        # print('The recording is already running')
 
 def stop():
     global end
@@ -126,7 +126,7 @@ def stop():
     message_label.config(text=message)
     message_label.grid(row=0, column=0, padx=10, pady=10)
     root.geometry(f'{width + 105}x625')
-    print("Set end to true")
+    # print("Set end to true")
 
 def make_video():
     # put turning into video code here
@@ -156,13 +156,13 @@ def make_video():
         message_label.config(text=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
         root.geometry(f'{(width + round(len(message)*4.69))}x625')  #no clue why this makes the window go berserk
-        print("video made")
+        # print("video made")
     else:
         message = "Stop the recording first"
         message_label.config(text=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
         root.geometry(f'{width + round(len(message)*4.55)}x625')
-        print("ERR: The recording hasn't been stopped")
+        # print("ERR: The recording hasn't been stopped")
 
 def clean_temp():
     #   removal of temp_storage code
@@ -173,7 +173,7 @@ def clean_temp():
         message_label.config(text=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
         root.geometry(f'{width + round(len(message)*4.55)}x625')
-        print("Video has not been made yet, click clean temp again to delete.")
+        # print("Video has not been made yet, click clean temp again to delete.")
         made_video = True
         return
 
@@ -186,13 +186,13 @@ def clean_temp():
         message_label.config(text=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
         root.geometry(f'{width + round(len(message)*4.55)}x625')
-        print("Removed temp_storage and all its files")
+        # print("Removed temp_storage and all its files")
     else:
         message = "temp_storage does not exist"
         message_label.config(text=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
         root.geometry(f'{width + round(len(message)*4.55)}x625')
-        print("temp_storage does not exist")
+        # print("temp_storage does not exist")
 
 
 # this is to bypass the "threads can only be started once" error
@@ -204,16 +204,16 @@ def start_thread():
     global running
     global message_label
     if running == False:
-        print("Starting thread")
+        # print("Starting thread")
         thread = create_start_thread()
-        print(thread)
+        # print(thread)
         thread.start()
     elif end == False:
         message = "The recording is already running"
         message_label.config(text=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
         root.geometry(f'{width + round(len(message)*4.55)}x625')
-        print("The recording is already running")
+        # print("The recording is already running")
 
 start_button = Button(toolbar, text="Start recording", command=start_thread)
 start_button.grid(row=0, column=0, padx=10, pady=10)
@@ -250,13 +250,13 @@ def fps_changer():
         message_label.config(text=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
         root.geometry(f'{width + round(len(message)*4.55)}x625')
-        print(f"changed seconds_per_frame to {seconds_per_frame}")
+        # print(f"changed seconds_per_frame to {seconds_per_frame}")
     else: 
         message = "enter a valid input please"
         message_label.config(text=message)
         message_label.grid(row=0, column=0, padx=10, pady=10)
         root.geometry(f'{width + round(len(message)*4.55)}x625')
-        print("invalid input for change fps")
+        # print("invalid input for change fps")
 
 fps_button = Button(toolbar, text="<", command=fps_changer)
 fps_button.grid(row=4, column=1, padx=5, pady=10)
